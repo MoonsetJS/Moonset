@@ -11,6 +11,7 @@ import * as vi from '../visitor';
 import {StringAsset, FileAsset} from './asset';
 import * as path from 'path';
 import {Config, ConfigConstant as CC, Serde} from '@moonset/util';
+import {HiveTaskBuilder} from "../../HiveTask/HiveTaskBuilder";
 
 export class MoonsetApp {
     app: cdk.App;
@@ -137,39 +138,7 @@ class MoonsetJobStack extends cdk.Stack {
           const task = (<vi.TaskNode>command.node).task;
 
           if (task.hive) {
-            let s3File;
-            if (task.hive.sqlFile) {
-              s3File = task.hive.sqlFile;
-              if (!task.hive.sqlFile.startsWith('s3://')) {
-                s3File = new FileAsset(this, `op-${i}-sql`, {
-                  path: task.hive.sqlFile,
-                }).getS3Path();
-              }
-            } else if (task.hive.sql) {
-              s3File = new StringAsset(this, `op-${i}-sql`, {
-                content: task.hive.sql,
-              }).getS3Path();
-            } else {
-              throw Error('Either sqlFile or sql must exist for hive.');
-            }
-
-            const emrTask = new sfn.Task(this, `op-${i}-HiveTask`, {
-              task: new sfnTasks.EmrAddStep({
-                clusterId: sfn.Data.stringAt('$.EmrSettings.ClusterId'),
-                name: 'HiveTask',
-                jar: MC.SCRIPT_RUNNER,
-                args: [
-                  's3://elasticmapreduce/libs/hive/hive-script',
-                  '--run-hive-script',
-                  '--args',
-                  '-f',
-                  s3File,
-                ],
-                actionOnFailure: sfnTasks.ActionOnFailure.TERMINATE_CLUSTER,
-                integrationPattern: sfn.ServiceIntegrationPattern.SYNC,
-              }),
-              resultPath: sfn.DISCARD,
-            });
+            const emrTask = HiveTaskBuilder.createHiveTask(this, task.hive, `${i}`)
             chain = chain.next(emrTask);
           }
           break;
