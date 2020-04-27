@@ -22,6 +22,7 @@
     "url": "git+https://github.com/FBAChinaOpenSource/Moonset.git"
   },
   "scripts": {
+    "cli": "./cli.js",
     "build": "tsc",
     "watch": "tsc -w",
     "lint": "eslint --fix ./lib/**/*.ts",
