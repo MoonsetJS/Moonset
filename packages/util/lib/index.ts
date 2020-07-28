@@ -5,3 +5,4 @@ export * from './cdk-resource-reader';
 export * from './sdk-utils';
 export * from './s3-asset-uploader';
 export * from './constants';
+export * from './eslintrc';
