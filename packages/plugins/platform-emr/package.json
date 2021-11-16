@@ -39,7 +39,7 @@
     "@moonset/executor": "^0.0.29",
     "@moonset/util": "^0.0.29",
     "aws-cdk": "1.41.0",
-    "aws-sdk": "2.683.0",
+    "aws-sdk": "2.814.0",
     "execa": "4.0.2",
     "uuid": "8.1.0"
   },
